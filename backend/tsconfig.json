@@ -21,6 +21,7 @@
     "src/server.ts",
     "src/routes/**/*",
     "src/middleware/**/*",
+    "src/config/uploads.ts",
     "src/services/helper-functions.ts",
     "src/types/**/*"
   ],
