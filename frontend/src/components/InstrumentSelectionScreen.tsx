@@ -115,7 +115,7 @@ function Frame12({
 import Cello1 from '../assets/cello-1.png';
 import DoubleBassImg from '../assets/Double Bass.png';
 import ViolaImg from '../assets/Viola.png';
-import ViolinImg from '../assets/Violin.png';
+import ViolinImg from '../assets/violin.png';
 
 // Icon components for each instrument
 function CelloFullIcon() {
