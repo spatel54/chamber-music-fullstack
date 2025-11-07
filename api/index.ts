@@ -33,35 +33,135 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Harmonize endpoint
     if (url?.includes('/harmonize')) {
       try {
-        console.log('[API] Loading harmonize dependencies...');
+        console.log('[API] Harmonize request received - returning mock data');
         
-        // Dynamically import Express app for harmonize functionality
-        const express = await import('express');
-        const cors = await import('cors');
-        
-        console.log('[API] Loading harmonize router...');
-        const { default: harmonizeRouter } = await import('../backend/dist/routes/harmonize.js');
-        
-        console.log('[API] Setting up Express app...');
-        const app = express.default();
-        app.use(express.default.json());
-        app.use(express.default.urlencoded({ extended: true }));
-        app.use(cors.default({ origin: true, credentials: true }));
-        app.use('/', harmonizeRouter);
-        
-        console.log('[API] Executing harmonize handler...');
-        // Use app as middleware
-        return new Promise((resolve, reject) => {
-          app(req as any, res as any, (err: any) => {
-            if (err) {
-              console.error('[API] Harmonize handler error:', err);
-              reject(err);
-            } else {
-              console.log('[API] Harmonize handler completed');
-              resolve(undefined);
-            }
-          });
+        // Mock response for testing the full flow
+        const mockHarmonyXML = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <work>
+    <work-title>Harmonized Music (Mock)</work-title>
+  </work>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Harmony</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+      </note>
+    </measure>
+  </part>
+</score-partwise>`;
+
+        const mockCombinedXML = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <work>
+    <work-title>Combined Score (Mock)</work-title>
+  </work>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Melody</part-name>
+    </score-part>
+    <score-part id="P2">
+      <part-name>Harmony</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+      </note>
+    </measure>
+  </part>
+  <part id="P2">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+      </note>
+    </measure>
+  </part>
+</score-partwise>`;
+
+        // Simulate processing time
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        return res.status(200).json({
+          harmonyOnly: {
+            content: mockHarmonyXML,
+            filename: 'mock_harmony.musicxml'
+          },
+          combined: {
+            content: mockCombinedXML,
+            filename: 'mock_combined.musicxml'
+          },
+          metadata: {
+            instruments: ['Violin', 'Cello'],
+            processingTime: 500,
+            note: 'This is mock data for testing the frontend flow'
+          }
         });
+
       } catch (harmonizeError) {
         console.error('[API] Harmonize error:', harmonizeError);
         return res.status(500).json({
