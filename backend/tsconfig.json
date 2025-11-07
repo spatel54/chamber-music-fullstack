@@ -23,6 +23,8 @@
     "src/middleware/**/*",
     "src/config/uploads.ts",
     "src/services/helper-functions.ts",
+    "src/services/musicProcessor.ts",
+    "src/services/xml-generators.ts",
     "src/types/**/*"
   ],
   "exclude": [
