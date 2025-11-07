@@ -378,7 +378,7 @@ function Frame14({
   );
 }
 
-const INSTRUMENTS_OPTIONS = ['Altor', 'Tenor', 'Bass'];
+const INSTRUMENTS_OPTIONS = ['Full-Size Cello', 'Double Bass', 'Viola', 'Violin'];
 const STYLE_OPTIONS = ['Classical', 'Jazz', 'Pop', 'Rock', 'Blues', 'Folk'];
 const DIFFICULTY_OPTIONS = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
 
