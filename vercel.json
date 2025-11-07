@@ -8,16 +8,6 @@
       "destination": "/api/index.ts"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/build/$1"
-    }
-  ],
   "functions": {
     "api/index.ts": {
       "maxDuration": 10,
