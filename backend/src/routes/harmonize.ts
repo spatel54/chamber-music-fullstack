@@ -5,7 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { validateFileUpload } from '../middleware/fileValidator.js';
 import { harmonizeMelody } from '../services/musicProcessor.js';
-import { uploadsDir } from '../server.js';
+import { uploadsDir } from '../config/uploads.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -1,31 +1,8 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
 import harmonizeRouter from '../backend/src/routes/harmonize.js';
 
-// Load environment variables
-dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
-
-// Create uploads directory if it doesn't exist
-// Use /tmp for serverless environments (Vercel)
-const uploadsDir = process.env.VERCEL 
-  ? '/tmp/uploads'
-  : path.join(__dirname, '..', 'uploads');
-
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Export uploadsDir for use in routes
-export { uploadsDir };
 
 // Middleware
 app.use(express.json());
