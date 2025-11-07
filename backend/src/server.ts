@@ -17,10 +17,17 @@ const PORT = process.env.PORT || 3001;
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'];
 
 // Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, '..', 'uploads');
+// Use /tmp for serverless environments (Vercel)
+const uploadsDir = process.env.VERCEL 
+  ? '/tmp/uploads'
+  : path.join(__dirname, '..', 'uploads');
+
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
+
+// Export uploadsDir for use in routes
+export { uploadsDir };
 
 // Middleware
 // Note: CORS is applied per-route below, not globally, to avoid blocking static assets

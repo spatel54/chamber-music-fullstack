@@ -136,6 +136,7 @@ function harmonizeMonophonic(
   const melodyNotes = extractNotes(xmlDoc);
   console.log("[Harmonize] Found", melodyNotes.length, "melody notes");
 
+  // Use v0version accurate harmonization
   let harmonicProgression = generateHarmonicProgression(melodyNotes, root, scale, mode, instruments.length > 1);
   console.log("[Harmonize] Generated", harmonicProgression.length, "chords");
 
@@ -147,8 +148,9 @@ function harmonizeMonophonic(
     harmonicProgression = refineHarmonicProgression(harmonicProgression, melodyNotes, root, scale, mode === "major");
   }
 
+  // v0version voice mapping: voice 1=alto, 2=tenor, 3=bass  
   const instrumentVoiceMappings: Record<string, 1 | 2 | 3> = {};
-  const voiceOrder: (1 | 2 | 3)[] = [1, 3, 2];
+  const voiceOrder: (1 | 2 | 3)[] = [1, 3, 2]; // Same as v0
   instruments.forEach((instrument, index) => {
     instrumentVoiceMappings[instrument] = voiceOrder[index % 3];
   });

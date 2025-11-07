@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import svgPaths from "../imports/editIconPaths";
 import { X, Save, Share2, Download, Music2, Sparkles, BarChart3 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -146,53 +147,99 @@ function Maximize({ onClick }: { onClick: () => void }) {
 
 function ExpandedMusicPlayer({
   onClose,
+  musicXML,
 }: {
   onClose: () => void;
+  musicXML?: string;
 }) {
-  const [currentPage, setCurrentPage] = useState(0);
-  const totalPages = 3; // Number of pages in the sheet music
+  const containerRef = useRef<HTMLDivElement>(null);
+  const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (musicXML && containerRef.current) {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Clean up previous instance
+        if (osmdRef.current) {
+          osmdRef.current.clear();
+        }
+
+        // Create new OSMD instance with larger settings for expanded view
+        osmdRef.current = new OpenSheetMusicDisplay(containerRef.current, {
+          autoResize: true,
+          drawTitle: true,
+          drawComposer: false,
+          drawCredits: false,
+          backend: "svg",
+        });
+
+        // Load and render the MusicXML
+        osmdRef.current.load(musicXML).then(() => {
+          if (osmdRef.current) {
+            osmdRef.current.render();
+            setIsLoading(false);
+          }
+        }).catch((err) => {
+          console.error('Error rendering sheet music:', err);
+          setError('Failed to render sheet music');
+          setIsLoading(false);
+        });
+      } catch (err) {
+        console.error('Error initializing OSMD:', err);
+        setError('Failed to initialize music renderer');
+        setIsLoading(false);
+      }
+    }
+
+    return () => {
+      if (osmdRef.current) {
+        osmdRef.current.clear();
+        osmdRef.current = null;
+      }
+    };
+  }, [musicXML]);
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8">
       <div className="bg-[#f8f3eb] rounded-[24px] sm:rounded-[36px] md:rounded-[48px] lg:rounded-[54.392px] w-full max-w-6xl h-[85vh] sm:h-[80vh] relative shadow-2xl flex flex-col">
-        <div className="absolute right-4 sm:right-6 md:right-8 top-4 sm:top-6 md:top-8">
+        <div className="absolute right-4 sm:right-6 md:right-8 top-4 sm:top-6 md:top-8 z-10">
           <Button 
             onClick={onClose} 
             variant="ghost" 
             size="icon"
-            className="h-12 w-12 rounded-full hover:bg-[#e5ddd5]/50"
+            className="h-12 w-12 rounded-full hover:bg-[#e5ddd5]/50 bg-white/90"
             aria-label="Close expanded view"
           >
             <X size={24} className="text-[#1e1e1e]" />
           </Button>
         </div>
-        <div className="flex-1 flex items-center justify-center overflow-hidden px-4">
-          <div className="text-center">
-            <p className="font-['Figtree:Bold',_sans-serif] text-[#201315] text-[20px] sm:text-[24px] md:text-[28px] lg:text-[32px] mb-3 sm:mb-4">
-              Harmony Sheet Music Preview
-            </p>
-            <p className="font-['Figtree:Regular',_sans-serif] text-[#666] text-[14px] sm:text-[15px] md:text-[16px] lg:text-[18px] mb-1.5 sm:mb-2">
-              Page {currentPage + 1} of {totalPages}
-            </p>
-            <p className="font-['Figtree:Regular',_sans-serif] text-[#666] text-[14px] sm:text-[15px] md:text-[16px] lg:text-[18px]">
-              Sheet music content would appear here
-            </p>
-          </div>
-        </div>
-        {/* Pagination dots at bottom */}
-        <div className="pb-6 sm:pb-7 md:pb-8 flex justify-center gap-2.5 sm:gap-3 md:gap-4">
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentPage(index)}
-              className={`size-[20px] sm:size-[24px] md:size-[28px] rounded-full transition-all duration-200 ${
-                index === currentPage 
-                  ? 'bg-[#e76d57] scale-110' 
-                  : 'bg-[#1e1e1e] hover:bg-[#4a4a4a]'
-              }`}
-              aria-label={`Go to page ${index + 1}`}
-            />
-          ))}
+        <div className="flex-1 flex items-center justify-center overflow-auto px-4 pt-16 pb-8">
+          {isLoading && (
+            <div className="text-center">
+              <p className="font-['Figtree:Bold',_sans-serif] text-[#201315] text-[20px] sm:text-[24px] mb-2">
+                Loading Sheet Music...
+              </p>
+            </div>
+          )}
+          {error && (
+            <div className="text-center">
+              <p className="font-['Figtree:Bold',_sans-serif] text-red-600 text-[20px] sm:text-[24px] mb-2">
+                {error}
+              </p>
+              <p className="font-['Figtree:Regular',_sans-serif] text-[#666] text-[14px]">
+                Please try exporting the file instead.
+              </p>
+            </div>
+          )}
+          <div 
+            ref={containerRef} 
+            className={`w-full ${isLoading || error ? 'hidden' : 'block'}`}
+            style={{ minHeight: '400px' }}
+          />
         </div>
       </div>
     </div>
@@ -209,24 +256,98 @@ function Frame15() {
   );
 }
 
-function Frame5({ onExpand, hasData }: { onExpand: () => void; hasData: boolean }) {
+function Frame5({ 
+  onExpand, 
+  hasData,
+  musicXML 
+}: { 
+  onExpand: () => void; 
+  hasData: boolean;
+  musicXML?: string;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (musicXML && containerRef.current && hasData) {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Clean up previous instance
+        if (osmdRef.current) {
+          osmdRef.current.clear();
+        }
+
+        // Create new OSMD instance
+        osmdRef.current = new OpenSheetMusicDisplay(containerRef.current, {
+          autoResize: true,
+          drawTitle: false,
+          drawComposer: false,
+          drawCredits: false,
+          backend: "svg",
+        });
+
+        // Load and render the MusicXML
+        osmdRef.current.load(musicXML).then(() => {
+          if (osmdRef.current) {
+            osmdRef.current.render();
+            setIsLoading(false);
+          }
+        }).catch((err) => {
+          console.error('Error rendering sheet music:', err);
+          setError('Failed to render');
+          setIsLoading(false);
+        });
+      } catch (err) {
+        console.error('Error initializing OSMD:', err);
+        setError('Render error');
+        setIsLoading(false);
+      }
+    }
+
+    return () => {
+      if (osmdRef.current) {
+        osmdRef.current.clear();
+        osmdRef.current = null;
+      }
+    };
+  }, [musicXML, hasData]);
+
   return (
     <div className="relative w-full max-w-[650px] aspect-[774/552] shrink-0">
-      <div className="absolute bg-[#d9d9d9] inset-0 rounded-[16px] sm:rounded-[20px] md:rounded-[24px] shadow-lg flex items-center justify-center">
-        {hasData ? (
-          <div className="flex flex-col items-center gap-4 px-4">
-            <Music2 size={48} className="text-[#201315]" />
-            <p className="font-['Figtree:SemiBold',_sans-serif] text-[#201315] text-[16px] sm:text-[18px] md:text-[20px] text-center">
-              Harmony Ready!
+      <div className="absolute bg-white inset-0 rounded-[16px] sm:rounded-[20px] md:rounded-[24px] shadow-lg overflow-hidden">
+        {!hasData ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="font-['Figtree:Regular',_sans-serif] text-[#666] text-[14px] sm:text-[15px] md:text-[16px] lg:text-[18px] px-4 text-center">
+              Harmony Sheet Music Preview
             </p>
-            <p className="font-['Figtree:Regular',_sans-serif] text-[#666] text-[12px] sm:text-[14px] text-center">
-              Click Export to download your harmonized sheet music
+          </div>
+        ) : isLoading ? (
+          <div className="flex flex-col items-center justify-center h-full gap-3 px-4">
+            <Music2 size={40} className="text-[#201315] animate-pulse" />
+            <p className="font-['Figtree:SemiBold',_sans-serif] text-[#201315] text-[14px] sm:text-[16px] text-center">
+              Loading Sheet Music...
+            </p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-full gap-3 px-4">
+            <Music2 size={40} className="text-[#201315]" />
+            <p className="font-['Figtree:SemiBold',_sans-serif] text-[#201315] text-[14px] sm:text-[16px] text-center">
+              Preview Unavailable
+            </p>
+            <p className="font-['Figtree:Regular',_sans-serif] text-[#666] text-[11px] sm:text-[12px] text-center">
+              Click Export to download
             </p>
           </div>
         ) : (
-          <p className="font-['Figtree:Regular',_sans-serif] text-[#666] text-[14px] sm:text-[15px] md:text-[16px] lg:text-[18px] px-4 text-center">
-            Harmony Sheet Music Preview
-          </p>
+          <div 
+            ref={containerRef} 
+            className="w-full h-full overflow-auto p-2 sm:p-3"
+            style={{ fontSize: '0.8em' }}
+          />
         )}
       </div>
       <Maximize onClick={onExpand} />
@@ -320,6 +441,7 @@ function Frame13({
   onEditStyle,
   onEditDifficulty,
   hasData,
+  musicXML,
 }: {
   instruments: string[];
   styles: string[];
@@ -330,10 +452,11 @@ function Frame13({
   onEditStyle: (tag: string, index: number) => void;
   onEditDifficulty: (tag: string, index: number) => void;
   hasData: boolean;
+  musicXML?: string;
 }) {
   return (
     <div className="content-stretch flex flex-col lg:flex-row gap-5 lg:gap-6 items-start w-full">
-      <Frame5 onExpand={onExpand} hasData={hasData} />
+      <Frame5 onExpand={onExpand} hasData={hasData} musicXML={musicXML} />
       <Frame6
         instruments={instruments}
         styles={styles}
@@ -383,7 +506,9 @@ function Frame14({
   console.log('[ResultsScreen Frame14] data.harmonyOnly:', data.harmonyOnly);
   console.log('[ResultsScreen Frame14] data.combined:', data.combined);
   const hasData = !!(data.harmonyOnly || data.combined);
+  const musicXML = data.combined?.content || data.harmonyOnly?.content;
   console.log('[ResultsScreen Frame14] hasData:', hasData);
+  console.log('[ResultsScreen Frame14] musicXML length:', musicXML?.length);
   
   return (
     <div className="content-stretch flex flex-col gap-5 md:gap-6 w-full">
@@ -398,6 +523,7 @@ function Frame14({
           onEditStyle={onEditStyle}
           onEditDifficulty={onEditDifficulty}
           hasData={hasData}
+          musicXML={musicXML}
         />
       </div>
       <div className="flex justify-center w-full">
@@ -598,6 +724,8 @@ export default function ResultsScreen({
               instruments: currentInstruments,
               style: currentStyle,
               difficulty: currentDifficulty,
+              harmonyOnly: data.harmonyOnly,
+              combined: data.combined,
             }}
             onRegenerate={onRegenerate}
             onGenerateNew={onGenerateNew}
@@ -610,6 +738,7 @@ export default function ResultsScreen({
       {isExpanded && (
         <ExpandedMusicPlayer
           onClose={() => setIsExpanded(false)}
+          musicXML={data.combined?.content || data.harmonyOnly?.content}
         />
       )}
       

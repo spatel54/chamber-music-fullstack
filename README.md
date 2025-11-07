@@ -186,7 +186,40 @@ cd backend
 npm run build
 ```
 
-## 📄 License
+## � Deployment
+
+### Vercel Deployment
+
+This application is configured for easy deployment to Vercel.
+
+**Quick Deploy:**
+1. Push your code to GitHub
+2. Import your repository in [Vercel](https://vercel.com)
+3. Vercel will automatically detect the configuration
+4. Click "Deploy"
+
+**Detailed Instructions:**
+See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for complete deployment guide including:
+- Environment variable configuration
+- CORS setup
+- Function limits and optimization
+- Troubleshooting tips
+
+**Required Environment Variables:**
+```
+NODE_ENV=production
+ALLOWED_ORIGINS=https://your-app.vercel.app
+```
+
+### Other Deployment Options
+
+The application can also be deployed to:
+- **Heroku**: Traditional server deployment
+- **Railway**: Modern platform with easy setup
+- **AWS/GCP**: For production-scale applications
+- **Docker**: Container-based deployment
+
+## �📄 License
 
 This project is part of an academic/personal project.
 

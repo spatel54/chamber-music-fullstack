@@ -5,6 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { validateFileUpload } from '../middleware/fileValidator.js';
 import { harmonizeMelody } from '../services/musicProcessor.js';
+import { uploadsDir } from '../server.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,7 +15,6 @@ const router = express.Router();
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
     cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
