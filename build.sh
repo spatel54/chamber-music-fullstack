@@ -5,12 +5,10 @@
 
 set -e
 
-cd frontend
-
 echo "Installing frontend dependencies..."
-npm ci
+npm ci --prefix frontend
 
 echo "Building frontend..."
-npm run build
+npm run --prefix frontend build
 
 echo "Build complete!"
