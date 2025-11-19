@@ -88,6 +88,20 @@ npm start
 # No build step required (pure Node.js)
 ```
 
+### Deploying to Vercel
+
+**Full-stack deployment with serverless functions:**
+
+See **[VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)** for complete instructions.
+
+**Quick Deploy:**
+1. Push to GitHub
+2. Import to Vercel
+3. Deploy (uses `vercel.json` configuration)
+4. Done! Frontend + Backend integrated automatically
+
+**Production URL:** https://harmonyforge-fullstack.vercel.app/
+
 ## 📁 Project Structure
 
 ```
@@ -151,6 +165,7 @@ chamber-music-fullstack/
 
 ## 📚 Documentation
 
+- **[VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)** - Complete Vercel deployment guide (NEW!)
 - **[CLAUDE.md](CLAUDE.md)** - Comprehensive guide for Claude Code development
 - **[INTEGRATION.md](INTEGRATION.md)** - Full integration guide with architecture details
 - **[.claude/agents/README.md](.claude/agents/README.md)** - Specialized agent system guide

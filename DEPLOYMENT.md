@@ -1,5 +1,11 @@
 # Deployment Guide
 
+> **🚀 For complete Vercel deployment instructions, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)**
+
+---
+
+# Deployment Guide (Legacy)
+
 ## Prerequisites
 
 - Node.js 18.x or higher

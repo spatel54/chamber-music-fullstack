@@ -3,7 +3,10 @@
  * Handles all communication with the harmonization API
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// In production (Vercel), use relative paths to access serverless functions
+// In development, use the local backend server
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD ? '' : 'http://localhost:3001');
 
 export interface HarmonizeParams {
   file: File;
