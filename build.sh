@@ -6,9 +6,11 @@
 set -e
 
 echo "Installing frontend dependencies..."
-npm ci --prefix frontend
+cd frontend
+npm ci
 
 echo "Building frontend..."
-npm run --prefix frontend build
+# Use npx which will look in node_modules/.bin
+npx vite build
 
 echo "Build complete!"
