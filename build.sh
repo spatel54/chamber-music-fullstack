@@ -10,7 +10,7 @@ cd frontend
 npm ci
 
 echo "Building frontend..."
-# Use npx which will look in node_modules/.bin
-npx vite build
+# Use the vite binary directly from node_modules
+./node_modules/.bin/vite build
 
 echo "Build complete!"
